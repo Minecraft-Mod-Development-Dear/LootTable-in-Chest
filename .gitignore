@@ -1,0 +1,35 @@
+# Gradle
+.gradle/
+build/
+out/
+
+# ForgeGradle / Minecraft run output
+run/
+eclipse/
+*.launch
+
+# Java build artifacts
+*.class
+*.jar
+*.war
+*.ear
+
+# IDE and editor files
+.idea/
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
