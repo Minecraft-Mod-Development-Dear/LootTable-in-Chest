@@ -1,0 +1,16 @@
+[
+  {
+    "modid": "loottablechesttool",
+    "name": "Loot Table Chest Tool",
+    "description": "Debug command for placing chests with selected loot tables.",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "",
+    "updateUrl": "",
+    "authorList": ["Minecraft-Mod-Development-Dear"],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": []
+  }
+]

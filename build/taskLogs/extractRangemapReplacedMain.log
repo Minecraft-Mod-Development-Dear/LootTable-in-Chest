@@ -1,0 +1,10 @@
+Unsupposrted library path: C:\Users\81806\Desktop\0 ModProject\LootTableChestTool\build\classes\java\api
+Unsupposrted library path: C:\Users\81806\Desktop\0 ModProject\LootTableChestTool\build\resources\api
+Symbol range map extraction starting
+Processing 2 files
+startProcessing "com/minecraftmoddevelopmentdear/loottablechesttool/LootChestCommand.java" md5: f35feee41871f376e624191230a0c771
+endProcessing "com/minecraftmoddevelopmentdear/loottablechesttool/LootChestCommand.java"
+
+startProcessing "com/minecraftmoddevelopmentdear/loottablechesttool/LootTableChestTool.java" md5: ba401693967fc53059cddf1b6e99d57f
+endProcessing "com/minecraftmoddevelopmentdear/loottablechesttool/LootTableChestTool.java"
+
