@@ -44,3 +44,7 @@ processResources {
 }
 
 build.dependsOn reobfJar
+
+tasks.matching { it.name == 'sourceJar' }.all {
+    enabled = false
+}

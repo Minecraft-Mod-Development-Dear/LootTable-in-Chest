@@ -80,9 +80,9 @@ jobs:
         run: |
           set -euo pipefail
 
-          mapfile -t files < <(compgen -G "build/libs/*.jar" || true)
+          mapfile -t files < <(find build/libs -maxdepth 1 -type f -name "*.jar" ! -name "*-sources.jar" | sort)
           if [[ "${#files[@]}" -eq 0 ]]; then
-            echo "No release artifacts matched: build/libs/*.jar" >&2
+            echo "No release artifacts matched: build/libs/*.jar excluding *-sources.jar" >&2
             exit 1
           fi
 
@@ -97,7 +97,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: release-artifacts-${{ steps.metadata.outputs.tag }}
-          path: build/libs/*.jar
+          path: |
+            build/libs/*.jar
+            !build/libs/*-sources.jar
           if-no-files-found: error
 
       - name: Create release notes

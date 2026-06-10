@@ -14,4 +14,4 @@ jobs:
       java-version: "8"
       gradle-version: "4.10.3"
       build-task: build
-      artifact-glob: build/libs/*.jar
+      artifact-glob: build/libs/loot-table-chest-tool-*.jar
