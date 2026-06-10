@@ -42,6 +42,11 @@ public final class LootChestCommand extends CommandBase {
     }
 
     @Override
+    public List<String> getAliases() {
+        return Collections.emptyList();
+    }
+
+    @Override
     public int getRequiredPermissionLevel() {
         return 2;
     }
