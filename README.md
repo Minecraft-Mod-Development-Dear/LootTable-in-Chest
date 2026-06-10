@@ -11,6 +11,7 @@ This is a Minecraft Forge 1.12.2 debug helper mod. It places chests with selecte
 - Use `count` to place multiple chests for each matched loot table.
 - If `count` is omitted, it defaults to `0`, so the command only reports how many tables matched.
 - The maximum count is 1000 chests per loot table.
+- loot table ID list : https://mcasset.cloud/1.12.2/assets/minecraft/loot_tables
 
 ### Requirements
 
@@ -85,7 +86,8 @@ Minecraft Forge 1.12.2 用のデバッグ補助 MOD です。指定したルー�
 - `count` を指定すると、各ルートテーブルごとに複数個のチェストを配置します。
 - `count` を省略した場合は `0` として扱われ、チェストを置かずに一致したテーブル数だけを表示します。
 - 配置数は 1 つのルートテーブルにつき最大 1000 個です。
-
+- ルートテーブルIDは左記を参照してください。https://mcasset.cloud/1.12.2/assets/minecraft/loot_tables
+- 
 ### 対応環境
 
 - Minecraft: `1.12.2`
