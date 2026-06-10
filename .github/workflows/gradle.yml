@@ -1,0 +1,20 @@
+name: Java CI with Gradle
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build
+    uses: Minecraft-Mod-Development-Dear/.github/.github/workflows/forge-gradle-ci.yml@main
+    with:
+      java-version: "8"
+      gradle-version: "4.10.3"
+      build-task: build
+      artifact-glob: build/libs/*.jar

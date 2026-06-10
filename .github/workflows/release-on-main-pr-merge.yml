@@ -1,0 +1,142 @@
+name: Release on main PR merge
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: read
+jobs:
+  release:
+    name: Build and release
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "8"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "4.10.3"
+
+      - name: Resolve Gradle command
+        id: gradle
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ -f ./gradlew ]]; then
+            chmod +x ./gradlew
+            echo "command=./gradlew" >> "${GITHUB_OUTPUT}"
+          else
+            echo "command=gradle" >> "${GITHUB_OUTPUT}"
+          fi
+
+      - name: Resolve release metadata
+        id: metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ ! -f build.gradle ]]; then
+            echo "build.gradle was not found at the repository root." >&2
+            exit 1
+          fi
+
+          version="$(sed -nE "s/^[[:space:]]*version[[:space:]]*=[[:space:]]*['\"]([^'\"]+)['\"].*/\1/p" build.gradle | head -n 1)"
+          if [[ -z "${version}" ]]; then
+            echo "Could not resolve project.version from build.gradle" >&2
+            exit 1
+          fi
+
+          short_sha="${GITHUB_SHA::7}"
+          tag="v${version}-${short_sha}"
+
+          {
+            echo "version=${version}"
+            echo "tag=${tag}"
+            echo "short_sha=${short_sha}"
+          } >> "${GITHUB_OUTPUT}"
+
+      - name: Build
+        shell: bash
+        run: ${{ steps.gradle.outputs.command }} --no-daemon build
+
+      - name: Collect artifacts
+        id: artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mapfile -t files < <(compgen -G "build/libs/*.jar" || true)
+          if [[ "${#files[@]}" -eq 0 ]]; then
+            echo "No release artifacts matched: build/libs/*.jar" >&2
+            exit 1
+          fi
+
+          printf '%s\n' "${files[@]}"
+          {
+            echo "files<<EOF"
+            printf '%s\n' "${files[@]}"
+            echo "EOF"
+          } >> "${GITHUB_OUTPUT}"
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-artifacts-${{ steps.metadata.outputs.tag }}
+          path: build/libs/*.jar
+          if-no-files-found: error
+
+      - name: Create release notes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          {
+            echo "Automated release for ${GITHUB_REPOSITORY}@${{ steps.metadata.outputs.short_sha }}."
+            echo
+            echo "- Version: ${{ steps.metadata.outputs.version }}"
+            echo "- Commit: ${GITHUB_SHA}"
+            if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+              echo "- Pull request: #${{ github.event.pull_request.number }}"
+            fi
+            echo "- Build task: build"
+            echo
+            echo "Artifacts:"
+            while IFS= read -r file; do
+              [[ -n "${file}" ]] && echo "- ${file}"
+            done <<< "${{ steps.artifacts.outputs.files }}"
+          } > release-notes.md
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.metadata.outputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if gh release view "${TAG}" >/dev/null 2>&1; then
+            echo "Release ${TAG} already exists; skipping publish."
+            exit 0
+          fi
+
+          mapfile -t files <<< "${{ steps.artifacts.outputs.files }}"
+          gh release create "${TAG}" "${files[@]}" \
+            --target "${GITHUB_SHA}" \
+            --title "${TAG}" \
+            --notes-file release-notes.md \
+            --latest=false
